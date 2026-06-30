@@ -1,6 +1,8 @@
 package com.axz.ffiec.authentication.entity;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +34,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "passwordHash")
+@ToString(exclude = {"passwordHash", "roles"})
 public class User {
 
     /**
@@ -119,6 +121,12 @@ public class User {
     private Instant lastLoginAt;
 
     /**
+     * Roles assigned to this user.
+     */
+    @Default
+    private Set<Role> roles = new HashSet<>();
+
+    /**
      * Returns whether the account is currently unlocked.
      *
      * @return true if the account is not locked
@@ -152,5 +160,40 @@ public class User {
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Assigns a role to this user.
+     *
+     * @param role role to assign
+     */
+    public void addRole(Role role) {
+        if (role != null) {
+            roles.add(role);
+        }
+    }
+
+    /**
+     * Removes a role from this user.
+     *
+     * @param role role to remove
+     */
+    public void removeRole(Role role) {
+        roles.remove(role);
+    }
+
+    /**
+     * Determines whether this user has a role with the given name.
+     *
+     * @param roleName role name to check
+     * @return true if the user has the role
+     */
+    public boolean hasRole(String roleName) {
+        if (roleName == null) {
+            return false;
+        }
+
+        return roles.stream()
+                .anyMatch(role -> roleName.equals(role.getName()));
     }
 }

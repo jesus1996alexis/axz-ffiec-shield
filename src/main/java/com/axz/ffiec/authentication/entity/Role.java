@@ -1,6 +1,8 @@
 package com.axz.ffiec.authentication.entity;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +31,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
+@ToString(exclude = "permissions")
 public class Role {
 
     /**
@@ -72,4 +74,45 @@ public class Role {
      * Last update timestamp.
      */
     private Instant updatedAt;
+
+    /**
+     * Permissions granted by this role.
+     */
+    @Default
+    private Set<Permission> permissions = new HashSet<>();
+
+    /**
+     * Grants a permission to this role.
+     *
+     * @param permission permission to grant
+     */
+    public void addPermission(Permission permission) {
+        if (permission != null) {
+            permissions.add(permission);
+        }
+    }
+
+    /**
+     * Removes a permission from this role.
+     *
+     * @param permission permission to remove
+     */
+    public void removePermission(Permission permission) {
+        permissions.remove(permission);
+    }
+
+    /**
+     * Determines whether this role grants a permission with the given name.
+     *
+     * @param permissionName permission name to check
+     * @return true if the role grants the permission
+     */
+    public boolean hasPermission(String permissionName) {
+        if (permissionName == null) {
+            return false;
+        }
+
+        return permissions.stream()
+                .anyMatch(permission -> permissionName.equals(permission.getName()));
+    }
 }
